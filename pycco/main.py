@@ -368,7 +368,13 @@ def destination(filepath, preserve_paths=True, outdir=None):
         name = filename
     if preserve_paths:
         name = path.join(dirname, name)
-    return path.join(outdir, "%s.html" % name)
+    dest = path.join(outdir, "%s.html" % name)
+    # If `join` is passed an absolute path, it will ignore any earlier path
+    # elements. We will force outdir to the beginning of the path to avoid
+    # writing outside our destination.
+    if not dest.startswith(outdir):
+        dest = outdir + os.sep + dest
+    return dest
 
 
 def shift(list, default):
