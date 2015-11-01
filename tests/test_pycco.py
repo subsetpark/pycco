@@ -6,6 +6,8 @@ from hypothesis.strategies import lists, text, booleans, choices
 
 import pycco.main as p
 
+PYTHON = p.languages['.py']
+
 
 @given(lists(text()), text())
 def test_shift(fragments, default):
@@ -33,3 +35,14 @@ def test_parse(choice, source):
 
 def test_generate_documentation():
     p.generate_documentation('pycco/main.py', outdir=tempfile.gettempdir())
+
+
+def test_skip_coding_directive():
+    source = """
+# -*- coding: utf-8 -*-
+def foo():
+    return True
+"""
+    parsed = p.parse(source, PYTHON)
+    for section in parsed:
+        assert "coding" not in section['code_text']
