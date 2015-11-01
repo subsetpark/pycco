@@ -61,8 +61,17 @@ def test_get_language_specify_language(source, code):
     with pytest.raises(ValueError):
         p.get_language(source, code, language="non-existent")
 
+
 @given(text() | none())
 def test_get_language_bad_source(source):
     code = "#!/usr/bin/python\n"
     code += FOO_FUNCTION
-    assert p.get_language(source, code) == p.languages['.py']
+    assert p.get_language(source, code) == PYTHON
+    with pytest.raises(ValueError):
+        assert p.get_language(source, "badlang")
+
+
+@given(text() | none())
+def test_get_language_bad_code(code):
+    source = "test.py"
+    assert p.get_language(source, code) == PYTHON
