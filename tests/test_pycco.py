@@ -96,8 +96,7 @@ def test_ensure_directory(dir_name):
     # pass in the unsanitized string to the function.
     safe_name = p.remove_control_chars(dir_name)
 
-    if not os.path.isdir(safe_name):
-        assume(os.access(safe_name, os.W_OK))
+    if not os.path.isdir(safe_name) and os.access(safe_name, os.W_OK):
         p.ensure_directory(tempdir)
         assert os.path.isdir(safe_name)
 
