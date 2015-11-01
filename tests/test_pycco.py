@@ -2,13 +2,14 @@ import copy
 import tempfile
 import pytest
 import os
+import re
 from hypothesis import given, example, assume
 from hypothesis.strategies import lists, text, booleans, choices, none
 
 import pycco.main as p
 
 PYTHON = p.languages['.py']
-
+PYCCO_SOURCE = 'pycco/main.py'
 FOO_FUNCTION = """def foo():\n    return True"""
 
 
@@ -35,10 +36,6 @@ def test_parse(choice, source):
     l = choice(p.languages.values())
     parsed = p.parse(source, l)
     assert [{"code_text", "docs_text"} == set(s.keys()) for s in parsed]
-
-
-def test_generate_documentation():
-    p.generate_documentation('pycco/main.py', outdir=tempfile.gettempdir())
 
 
 def test_skip_coding_directive():
@@ -81,9 +78,30 @@ def test_get_language_bad_code(code):
     assert p.get_language(source, code) == PYTHON
 
 
-@given(text())
+@given(text(max_size=64))
 def test_ensure_directory(dir_name):
     tempdir = os.path.join(tempfile.gettempdir(), dir_name)
-    if not os.path.isdir(tempdir):
+
+    # Copy and paste sanitization from function, but only for housekeeping. We
+    # pass in the unsanitized string to the function.
+    control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
+    control_char_re = re.compile(u'[{}]'.format(re.escape(control_chars)))
+    safe_name = control_char_re.sub('', tempdir)
+
+    if not os.path.isdir(safe_name):
+        assume(os.access(safe_name, os.W_OK))
         p.ensure_directory(tempdir)
-        assert os.path.isdir(tempdir)
+        assert os.path.isdir(safe_name)
+
+# The following functions get good test coverage, but effort should be put into
+# decomposing the functions they test and actually testing their output.
+
+
+def test_generate_documentation():
+    p.generate_documentation(PYCCO_SOURCE, outdir=tempfile.gettempdir())
+
+
+@given(booleans(), choices())
+def test_process(preserve_paths, choice):
+    lang_name = choice([l["name"] for l in p.languages.values()])
+    p.process([PYCCO_SOURCE], preserve_paths=preserve_paths, outdir=tempfile.gettempdir(), language=lang_name)
