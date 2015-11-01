@@ -46,3 +46,16 @@ def foo():
     parsed = p.parse(source, PYTHON)
     for section in parsed:
         assert "coding" not in section['code_text']
+
+
+def test_multi_line_leading_spaces():
+    source = """
+# This is a
+# comment that
+# is indented
+def foo():
+    return True
+"""
+    parsed = p.parse(source, PYTHON)
+    # The resulting comment has leading spaces stripped out.
+    assert parsed[1]["docs_text"] == "This is a\ncomment that\nis indented\n"
