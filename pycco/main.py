@@ -347,12 +347,18 @@ def get_language(source, code, language=None):
     if m and m.group(1) in languages:
         return languages[m.group(1)]
     else:
-        lang = lexers.guess_lexer(code).name.lower()
-        for l in languages.values():
-            if l["name"] == lang:
-                return l
-        else:
-            raise ValueError("Can't figure out the language!")
+        try:
+            lang = lexers.guess_lexer(code).name.lower()
+            for l in languages.values():
+                if l["name"] == lang:
+                    return l
+            else:
+                raise ValueError()
+        except ValueError:
+                # If pygments can't find any lexers, it will raise its own
+                # subclass of ValueError. We will catch it and raise ours
+                # for consistency.
+                raise ValueError("Can't figure out the language!")
 
 
 def destination(filepath, preserve_paths=True, outdir=None):

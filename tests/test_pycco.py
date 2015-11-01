@@ -67,8 +67,10 @@ def test_get_language_bad_source(source):
     code = "#!/usr/bin/python\n"
     code += FOO_FUNCTION
     assert p.get_language(source, code) == PYTHON
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as e:
         assert p.get_language(source, "badlang")
+
+    assert e.value.message == "Can't figure out the language!"
 
 
 @given(text() | none())
