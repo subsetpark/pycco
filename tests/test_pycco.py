@@ -1,5 +1,5 @@
 from hypothesis import given
-from hypothesis.strategies import lists, text, booleans, integers
+from hypothesis.strategies import lists, text, booleans, choices
 import pycco.main as p
 import copy
 
@@ -21,9 +21,8 @@ def test_destination(filepath, preserve_paths, outdir):
     assert dest.endswith(".html")
 
 
-@given(integers(min_value=0, max_value=12), text())
-def test_parse(n, source):
-    languages = p.languages
-    l = languages[languages.keys()[n]]
+@given(choices(), text())
+def test_parse(choice, source):
+    l = choice(p.languages.values())
     parsed = p.parse(source, l)
     assert [{"code_text", "docs_text"} == set(s.keys()) for s in parsed]
