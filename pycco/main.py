@@ -178,6 +178,9 @@ def preprocess(comment, preserve_paths=True, outdir=None):
                                                                 outdir=outdir)))
 
     def replace_section_name(match):
+        """
+        Replace equals-sign-formatted section names with anchor links.
+        """
         return '{lvl} <span id="{id}" href="{id}">{name}</span>'.format(
             lvl=re.sub('=', '#', match.group(1)),
             id=sanitize_section_name(match.group(2)),
@@ -367,7 +370,7 @@ def destination(filepath, preserve_paths=True, outdir=None):
         name = filename
     if preserve_paths:
         name = path.join(dirname, name)
-    dest = path.join(outdir, "{}.html".format(name))
+    dest = path.join(outdir, u"{}.html".format(name))
     # If `join` is passed an absolute path, it will ignore any earlier path
     # elements. We will force outdir to the beginning of the path to avoid
     # writing outside our destination.
