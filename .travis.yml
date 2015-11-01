@@ -7,5 +7,6 @@ install:
     - 'pip install -r requirements.test.txt'
 script:
     - 'py.test --cov=pycco tests/'
+    - 'python -m pycco.main pycco/main.py'
 after_success:
     - coveralls
