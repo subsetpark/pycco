@@ -47,7 +47,7 @@ def generate_documentation(source, outdir=None, preserve_paths=True,
     code = open(source, "r").read()
     language = get_language(source, code, language=language)
     sections = parse(code, language)
-    highlight(source, sections, language, preserve_paths=preserve_paths, outdir=outdir)
+    highlight(sections, language, preserve_paths=preserve_paths, outdir=outdir)
     return generate_html(source, sections, preserve_paths=preserve_paths, outdir=outdir)
 
 
@@ -116,7 +116,7 @@ def parse(code, language):
 
         elif multi_line:
             # Remove leading spaces
-            if re.match(r' {%d}' % len(indent_level), line):
+            if re.match(r' {:d}'.format(len(indent_level), line)):
                 docs_text += line[len(indent_level):] + '\n'
             else:
                 docs_text += line + '\n'
@@ -144,7 +144,7 @@ def parse(code, language):
 # === Preprocessing the comments ===
 
 
-def preprocess(comment, section_nr, preserve_paths=True, outdir=None):
+def preprocess(comment, preserve_paths=True, outdir=None):
     """
     Add cross-references before having the text processed by markdown.  It's
     possible to reference another file, like this : `[[main.py]]` which renders
@@ -165,24 +165,24 @@ def preprocess(comment, section_nr, preserve_paths=True, outdir=None):
         # Check if the match contains an anchor
         if '#' in match.group(1):
             name, anchor = match.group(1).split('#')
-            return " [%s](%s#%s)" % (name,
-                                     path.basename(destination(name,
-                                                               preserve_paths=preserve_paths,
-                                                               outdir=outdir)),
-                                     anchor)
+            return " [{}]({}#{})".format(name,
+                                         path.basename(destination(name,
+                                                                   preserve_paths=preserve_paths,
+                                                                   outdir=outdir)),
+                                         anchor)
 
         else:
-            return " [%s](%s)" % (match.group(1),
-                                  path.basename(destination(match.group(1),
-                                                            preserve_paths=preserve_paths,
-                                                            outdir=outdir)))
+            return " [{}]({})".format(match.group(1),
+                                      path.basename(destination(match.group(1),
+                                                                preserve_paths=preserve_paths,
+                                                                outdir=outdir)))
 
     def replace_section_name(match):
-        return '%(lvl)s <span id="%(id)s" href="%(id)s">%(name)s</span>' % {
-            "lvl": re.sub('=', '#', match.group(1)),
-            "id": sanitize_section_name(match.group(2)),
-            "name": match.group(2)
-        }
+        return '{lvl} <span id="{id}" href="{id}">{name}</span>'.format(
+            lvl=re.sub('=', '#', match.group(1)),
+            id=sanitize_section_name(match.group(2)),
+            name=match.group(2)
+        )
 
     comment = re.sub('^([=]+)([^=]+)[=]*\s*$', replace_section_name, comment)
     comment = re.sub('[^`]\[\[(.+?)\]\]', replace_crossref, comment)
@@ -192,7 +192,7 @@ def preprocess(comment, section_nr, preserve_paths=True, outdir=None):
 # === Highlighting the source code ===
 
 
-def highlight(source, sections, language, preserve_paths=True, outdir=None):
+def highlight(sections, language, preserve_paths=True, outdir=None):
     """
     Highlights a single chunk of code using the **Pygments** module, and runs
     the text of its corresponding comment through **Markdown**.
@@ -218,7 +218,6 @@ def highlight(source, sections, language, preserve_paths=True, outdir=None):
         except UnicodeError:
             docs_text = unicode(section["docs_text"].decode('utf-8'))
         section["docs_html"] = markdown(preprocess(docs_text,
-                                                   i,
                                                    preserve_paths=preserve_paths,
                                                    outdir=outdir))
         section["num"] = i
@@ -368,7 +367,7 @@ def destination(filepath, preserve_paths=True, outdir=None):
         name = filename
     if preserve_paths:
         name = path.join(dirname, name)
-    dest = path.join(outdir, "%s.html" % name)
+    dest = path.join(outdir, "{}.html".format(name))
     # If `join` is passed an absolute path, it will ignore any earlier path
     # elements. We will force outdir to the beginning of the path to avoid
     # writing outside our destination.
@@ -442,7 +441,7 @@ def process(sources, preserve_paths=True, outdir=None, language=None):
                 f.write(generate_documentation(s, preserve_paths=preserve_paths, outdir=outdir,
                                                language=language))
 
-            print "pycco = %s -> %s" % (s, dest)
+            print "pycco = {} -> {}".format(s, dest)
 
             if sources:
                 next_file()
