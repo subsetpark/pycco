@@ -343,7 +343,7 @@ def get_language(source, code, language=None):
         else:
             raise ValueError("Unknown forced language: " + language)
 
-    m = re.match(r'.*(\..+)', os.path.basename(source))
+    m = re.match(r'.*(\..+)', os.path.basename(source)) if source else None
     if m and m.group(1) in languages:
         return languages[m.group(1)]
     else:

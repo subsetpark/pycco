@@ -2,11 +2,13 @@ import copy
 import tempfile
 import pytest
 from hypothesis import given
-from hypothesis.strategies import lists, text, booleans, choices
+from hypothesis.strategies import lists, text, booleans, choices, none
 
 import pycco.main as p
 
 PYTHON = p.languages['.py']
+
+FOO_FUNCTION = """def foo():\n    return True"""
 
 
 @given(lists(text()), text())
@@ -38,32 +40,29 @@ def test_generate_documentation():
 
 
 def test_skip_coding_directive():
-    source = """
-# -*- coding: utf-8 -*-
-def foo():
-    return True
-"""
+    source = "# -*- coding: utf-8 -*-\n" + FOO_FUNCTION
     parsed = p.parse(source, PYTHON)
     for section in parsed:
         assert "coding" not in section['code_text']
 
 
 def test_multi_line_leading_spaces():
-    source = """
-# This is a
-# comment that
-# is indented
-def foo():
-    return True
-"""
+    source = "# This is a\n# comment that\n# is indented\n"
+    source += FOO_FUNCTION
     parsed = p.parse(source, PYTHON)
     # The resulting comment has leading spaces stripped out.
-    assert parsed[1]["docs_text"] == "This is a\ncomment that\nis indented\n"
+    assert parsed[0]["docs_text"] == "This is a\ncomment that\nis indented\n"
 
 
 @given(text(), text())
-def test_get_language(source, code):
+def test_get_language_specify_language(source, code):
     assert p.get_language(source, code, language="python") == p.languages['.py']
 
     with pytest.raises(ValueError):
         p.get_language(source, code, language="non-existent")
+
+@given(text() | none())
+def test_get_language_bad_source(source):
+    code = "#!/usr/bin/python\n"
+    code += FOO_FUNCTION
+    assert p.get_language(source, code) == p.languages['.py']
