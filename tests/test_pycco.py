@@ -1,7 +1,8 @@
 import copy
 import tempfile
 import pytest
-from hypothesis import given, example
+import os
+from hypothesis import given, example, assume
 from hypothesis.strategies import lists, text, booleans, choices, none
 
 import pycco.main as p
@@ -78,3 +79,11 @@ def test_get_language_bad_source(source):
 def test_get_language_bad_code(code):
     source = "test.py"
     assert p.get_language(source, code) == PYTHON
+
+
+@given(text())
+def test_ensure_directory(dir_name):
+    tempdir = os.path.join(tempfile.gettempdir(), dir_name)
+    if not os.path.isdir(tempdir):
+        p.ensure_directory(tempdir)
+        assert os.path.isdir(tempdir)
