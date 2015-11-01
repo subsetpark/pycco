@@ -1,19 +1,22 @@
 import copy
-import tempfile
-import pytest
 import os
-import re
+import tempfile
+
+import pytest
 from hypothesis import given, example, assume
 from hypothesis.strategies import lists, text, booleans, choices, none
 
 import pycco.main as p
 
+
 PYTHON = p.languages['.py']
 PYCCO_SOURCE = 'pycco/main.py'
 FOO_FUNCTION = """def foo():\n    return True"""
 
+
 def get_language(choice):
     return choice(list(p.languages.values()))
+
 
 @given(lists(text()), text())
 def test_shift(fragments, default):
