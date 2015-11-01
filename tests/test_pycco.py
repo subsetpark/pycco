@@ -12,6 +12,8 @@ PYTHON = p.languages['.py']
 PYCCO_SOURCE = 'pycco/main.py'
 FOO_FUNCTION = """def foo():\n    return True"""
 
+def get_language(choice):
+    return choice(list(p.languages.values()))
 
 @given(lists(text()), text())
 def test_shift(fragments, default):
@@ -33,7 +35,7 @@ def test_destination(filepath, preserve_paths, outdir):
 
 @given(choices(), text())
 def test_parse(choice, source):
-    l = choice(p.languages.values())
+    l = get_language(choice)
     parsed = p.parse(source, l)
     assert [{"code_text", "docs_text"} == set(s.keys()) for s in parsed]
 
@@ -69,7 +71,11 @@ def test_get_language_bad_source(source):
     with pytest.raises(ValueError) as e:
         assert p.get_language(source, "badlang")
 
-    assert e.value.message == "Can't figure out the language!"
+    msg = "Can't figure out the language!"
+    try:
+        assert e.value.message == msg
+    except AttributeError:
+        assert e.value.args[0] == msg
 
 
 @given(text() | none())
@@ -82,11 +88,9 @@ def test_get_language_bad_code(code):
 def test_ensure_directory(dir_name):
     tempdir = os.path.join(tempfile.gettempdir(), dir_name)
 
-    # Copy and paste sanitization from function, but only for housekeeping. We
+    # Use sanitization from function, but only for housekeeping. We
     # pass in the unsanitized string to the function.
-    control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
-    control_char_re = re.compile(u'[{}]'.format(re.escape(control_chars)))
-    safe_name = control_char_re.sub('', tempdir)
+    safe_name = p.remove_control_chars(dir_name)
 
     if not os.path.isdir(safe_name):
         assume(os.access(safe_name, os.W_OK))
