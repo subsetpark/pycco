@@ -300,7 +300,7 @@ languages = {
             "multistart": "=begin", "multiend": "=end"},
 
     ".py": {"name": "python", "symbol": "#",
-            "multistart": '"""', "multiend": '"""' },
+            "multistart": '"""', "multiend": '"""'},
 
     ".scm": {"name": "scheme", "symbol": ";;",
              "multistart": "#|", "multiend": "|#"},

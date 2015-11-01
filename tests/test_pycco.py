@@ -1,7 +1,7 @@
 import copy
 import tempfile
 import pytest
-from hypothesis import given
+from hypothesis import given, example
 from hypothesis.strategies import lists, text, booleans, choices, none
 
 import pycco.main as p
@@ -22,6 +22,7 @@ def test_shift(fragments, default):
 
 
 @given(text(), booleans(), text(min_size=1))
+@example("/foo", True, "0")
 def test_destination(filepath, preserve_paths, outdir):
     dest = p.destination(filepath, preserve_paths=preserve_paths, outdir=outdir)
     assert dest.startswith(outdir)
