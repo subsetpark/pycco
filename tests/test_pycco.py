@@ -1,7 +1,10 @@
+import copy
+import tempfile
+
 from hypothesis import given
 from hypothesis.strategies import lists, text, booleans, choices
+
 import pycco.main as p
-import copy
 
 
 @given(lists(text()), text())
@@ -26,3 +29,7 @@ def test_parse(choice, source):
     l = choice(p.languages.values())
     parsed = p.parse(source, l)
     assert [{"code_text", "docs_text"} == set(s.keys()) for s in parsed]
+
+
+def test_generate_documentation():
+    p.generate_documentation('pycco/main.py', outdir=tempfile.gettempdir())

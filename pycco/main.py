@@ -116,7 +116,7 @@ def parse(code, language):
 
         elif multi_line:
             # Remove leading spaces
-            if re.match(r' {:d}'.format(len(indent_level), line)):
+            if re.match(r' {:d}'.format(len(indent_level)), line):
                 docs_text += line[len(indent_level):] + '\n'
             else:
                 docs_text += line + '\n'
