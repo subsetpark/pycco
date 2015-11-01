@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 """
 "**Pycco**" is a Python port of [Docco](http://jashkenas.github.com/docco/):
@@ -464,7 +465,7 @@ def process(sources, preserve_paths=True, outdir=None, language=None):
                 f.write(generate_documentation(s, preserve_paths=preserve_paths, outdir=outdir,
                                                language=language))
 
-            print "pycco = {} -> {}".format(s, dest)
+            print("pycco = {} -> {}".format(s, dest))
 
             if sources:
                 next_file()
