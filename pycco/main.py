@@ -364,9 +364,9 @@ def get_language(source, code, language=None):
             else:
                 raise ValueError()
         except ValueError:
-                # If pygments can't find any lexers, it will raise its own
-                # subclass of ValueError. We will catch it and raise ours
-                # for consistency.
+            # If pygments can't find any lexers, it will raise its own
+            # subclass of ValueError. We will catch it and raise ours
+            # for consistency.
             raise ValueError("Can't figure out the language!")
 
 
