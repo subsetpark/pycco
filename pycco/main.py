@@ -407,6 +407,8 @@ def shift(list, default):
 
 
 def remove_control_chars(s):
+    # Sanitization regexp copied from
+    # http://stackoverflow.com/questions/92438/stripping-non-printable-characters-from-a-string-in-python
     from .compat import pycco_unichr
     control_chars = ''.join(map(pycco_unichr, list(range(0, 32)) + list(range(127, 160))))
     control_char_re = re.compile(u'[{}]'.format(re.escape(control_chars)))
@@ -417,8 +419,6 @@ def ensure_directory(directory):
     """
     Sanitize directory string and ensure that the destination directory exists.
     """
-    # Sanitization regexp copied from
-    # http://stackoverflow.com/questions/92438/stripping-non-printable-characters-from-a-string-in-python
     directory = remove_control_chars(directory)
     if not os.path.isdir(directory):
         os.makedirs(directory)
