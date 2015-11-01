@@ -1,6 +1,6 @@
 import copy
 import tempfile
-
+import pytest
 from hypothesis import given
 from hypothesis.strategies import lists, text, booleans, choices
 
@@ -59,3 +59,11 @@ def foo():
     parsed = p.parse(source, PYTHON)
     # The resulting comment has leading spaces stripped out.
     assert parsed[1]["docs_text"] == "This is a\ncomment that\nis indented\n"
+
+
+@given(text(), text())
+def test_get_language(source, code):
+    assert p.get_language(source, code, language="python") == p.languages['.py']
+
+    with pytest.raises(ValueError):
+        p.get_language(source, code, language="non-existent")
