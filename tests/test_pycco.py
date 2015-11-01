@@ -1,6 +1,7 @@
 import copy
 import os
 import tempfile
+import time
 
 import pytest
 from hypothesis import given, example, assume
@@ -89,7 +90,7 @@ def test_get_language_bad_code(code):
 
 @given(text(max_size=64))
 def test_ensure_directory(dir_name):
-    tempdir = os.path.join(tempfile.gettempdir(), dir_name)
+    tempdir = os.path.join(tempfile.gettempdir(), str(int(time.time())), dir_name)
 
     # Use sanitization from function, but only for housekeeping. We
     # pass in the unsanitized string to the function.
