@@ -239,10 +239,10 @@ def preprocess(comment, preserve_paths=True, outdir=None):
 # === Highlighting the source code ===
 
 # The start of each Pygments highlight block.
-highlight_start = "<div class=\"highlight\"><pre>"
+HIGHLIGHT_START = "<div class=\"highlight\"><pre>"
 
 # The end of each Pygments highlight block.
-highlight_end = "</pre></div>"
+HIGHLIGHT_END = "</pre></div>"
 
 
 def highlight(sections, language, **kwargs):
@@ -254,16 +254,16 @@ def highlight(sections, language, **kwargs):
     marker comments between each section and then splitting the result string
     wherever our markers occur.
     """
-    from compat import pycco_zip_longest
+    from pycco.compat import pycco_zip_longest
     output = pygments.highlight(
         language["divider_text"].join(section["code_text"].rstrip()
                                       for section in sections),
         language["lexer"],
         formatters.get_formatter_by_name("html"))
 
-    output = output.replace(highlight_start, "").replace(highlight_end, "")
+    output = output.replace(HIGHLIGHT_START, "").replace(HIGHLIGHT_END, "")
     fragments = re.split(language["divider_html"], output)
-    zipped = pycco_zip_longest(fragments, sections, xrange(len(sections)), fillvalue="")
+    zipped = pycco_zip_longest(fragments, sections, range(len(sections)), fillvalue="")
 
     return [highlight_section(*z, **kwargs) for z in zipped]
 
@@ -273,9 +273,9 @@ def highlight_section(fragment, section, i, preserve_paths=True, outdir=None):
         raise TypeError("Missing the required 'outdir' keyword argument.")
 
     highlighted = {}
-    highlighted["code_html"] = "".join([highlight_start,
+    highlighted["code_html"] = "".join([HIGHLIGHT_START,
                                         fragment,
-                                        highlight_end])
+                                        HIGHLIGHT_END])
     try:
         docs_text = unicode(section["docs_text"])
     except UnicodeError:

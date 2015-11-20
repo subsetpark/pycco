@@ -128,3 +128,18 @@ def x():
 
     assert docs_code_tuple_list[0]['docs_text'] == ''
     assert "#" not in docs_code_tuple_list[1]['docs_text']
+
+
+def test_pre_indent():
+    lines = [
+        'def foo():',
+        '    """',
+        '    Normal text',
+        '       indented_text',
+        '       second_line',
+        '    """',
+        '    pass'
+    ]
+    source = '\n'.join(lines)
+    parsed = p.parse(source, PYTHON)
+    highlighted = p.highlight(parsed, PYTHON, outdir="/")
